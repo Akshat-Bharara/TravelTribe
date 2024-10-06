@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1031658583493",
+    "project_id": "traveltribe-a2f84",
+    "storage_bucket": "traveltribe-a2f84.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1031658583493:android:208461a4835a719ce207ac",
+        "android_client_info": {
+          "package_name": "com.example.traveltribe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdTJD0MGDH5zN38YBgbR1Z8so9FNbYxgU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
