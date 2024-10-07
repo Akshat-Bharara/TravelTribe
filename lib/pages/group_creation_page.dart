@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 
 class GroupCreationPage extends StatefulWidget {
   @override
@@ -23,6 +23,9 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (groupName.isNotEmpty && destination.isNotEmpty && user != null && _startDate != null && _endDate != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      String userName = userDoc['fullName'] ?? 'Unknown User'; 
+
       await FirebaseFirestore.instance.collection('groups').add({
         'groupName': groupName,
         'destination': destination,
@@ -30,7 +33,7 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
         'startDate': DateFormat('dd-MM-yyyy').format(_startDate!),
         'endDate': DateFormat('dd-MM-yyyy').format(_endDate!),
         'owner': user.email,
-        'members': [user.email],
+        'members': [userName], 
       });
 
       Navigator.pop(context);
