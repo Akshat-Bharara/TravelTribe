@@ -1,58 +1,32 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:traveltribe/pages/all_groups_page.dart';
-import 'package:traveltribe/pages/group_details_page.dart';
-import 'package:traveltribe/pages/itinerary_page.dart';
-import 'package:traveltribe/pages/manage_join_requests_page.dart'; 
-import 'group_creation_page.dart';
-import 'login_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:traveltribe/bloc/auth/auth_bloc.dart';
+import 'package:traveltribe/models/user_model.dart';
+import 'package:traveltribe/router/app_router.dart';
 
+@RoutePage()
 class DashboardPage extends StatefulWidget {
+  final UserModel user;
+
+  const DashboardPage({super.key, required this.user});
+
   @override
   _DashboardPageState createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  String? currentUserName; 
-
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentUserName(); 
-  }
-
-  Future<void> _getCurrentUserName() async {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      var userData = userDoc.data() as Map<String, dynamic>;
-      setState(() {
-        currentUserName = userData['fullName']; 
-      });
-    }
-  }
-
   void _logout(BuildContext context) async {
-    await _auth.signOut();
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => LoginPage()),
-      (Route<dynamic> route) => false,
-    );
+    BlocProvider.of<AuthBloc>(context).add(AuthEvent.signOut());
   }
 
-  void _navigateToPage(BuildContext context, String groupId, bool hasItinerary) {
+  void _navigateToPage(
+      BuildContext context, String groupId, bool hasItinerary) {
     if (hasItinerary) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ItineraryPage(groupId: groupId)),
-      );
+      AutoRouter.of(context).push(ItineraryRoute(groupId: groupId, user: widget.user));
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => GroupDetailsPage(groupId: groupId)),
-      );
+      AutoRouter.of(context).push(GroupDetailsRoute(groupId: groupId, user: widget.user));
     }
   }
 
@@ -73,75 +47,61 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           children: [
             Expanded(
-              child: currentUserName == null
-                  ? Center(child: CircularProgressIndicator()) 
-                  : StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection('groups')
-                          .where('members', arrayContains: currentUserName) 
-                          .snapshots(),
-                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                        }
-                        if (snapshot.data!.docs.isEmpty) {
-                          return Center(child: Text('No groups yet!'));
-                        }
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('groups')
+                    .where(
+                      'members',
+                      arrayContains: widget.user.username,
+                    )
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (snapshot.data!.docs.isEmpty) {
+                    return Center(child: Text('No groups yet!'));
+                  }
 
-                        return ListView(
-                          children: snapshot.data!.docs.map((doc) {
-                            var groupData = doc.data() as Map<String, dynamic>;
-                            bool hasItinerary = groupData.containsKey('itinerary') && groupData['itinerary'] != null;
+                  return ListView(
+                    children: snapshot.data!.docs.map((doc) {
+                      var groupData = doc.data() as Map<String, dynamic>;
+                      bool hasItinerary = groupData.containsKey('itinerary') &&
+                          groupData['itinerary'] != null;
 
-                            return Card(
-                              elevation: 4,
-                              margin: EdgeInsets.symmetric(vertical: 8),
-                              child: ListTile(
-                                title: Text(
-                                  groupData['groupName'],
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Destination: ${groupData['destination']}'),
-                                    Text('Owner: ${groupData['owner']}'),
-                                  ],
-                                ),
-                                trailing: Icon(Icons.arrow_forward_ios),
-                                onTap: () {
-                                  _navigateToPage(context, doc.id, hasItinerary);
-                                },
-                              ),
-                            );
-                          }).toList(),
-                        );
-                      },
-                    ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AllGroupsPage()),
-                );
-              },
-              child: Text('View All Groups'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                      return Card(
+                        elevation: 4,
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        child: ListTile(
+                          title: Text(
+                            groupData['groupName'],
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Destination: ${groupData['destination']}'),
+                              Text('Owner: ${groupData['owner']}'),
+                            ],
+                          ),
+                          trailing: Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            _navigateToPage(context, doc.id, hasItinerary);
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
               ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ManageJoinRequestsPage()),
-                );
+                AutoRouter.of(context).navigate(ManageJoinRequestsRoute(user: widget.user));
               },
               child: Text('Manage Join Requests'),
               style: ElevatedButton.styleFrom(
@@ -153,10 +113,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => GroupCreationPage()),
-          );
+          AutoRouter.of(context).navigate(GroupCreationRoute(user: widget.user));
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.blueAccent,

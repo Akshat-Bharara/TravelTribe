@@ -1,14 +1,16 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:traveltribe/pages/itinerary_page.dart';  
+import 'package:traveltribe/models/user_model.dart';
+import 'package:traveltribe/router/app_router.dart'; 
 
+@RoutePage()
 class GroupDetailsPage extends StatelessWidget {
+  final UserModel user;
   final String groupId;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  GroupDetailsPage({required this.groupId});
+  GroupDetailsPage({required this.groupId, required this.user});
 
   Future<void> _generateItinerary(BuildContext context) async {
     final _gemini = Gemini.instance;
@@ -38,10 +40,7 @@ class GroupDetailsPage extends StatelessWidget {
         'itinerary': itinerary,
       });
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ItineraryPage(groupId: groupId)),
-      );
+      AutoRouter.of(context).navigate(ItineraryRoute(groupId: groupId, user: user));
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error generating itinerary: $error')),
@@ -96,7 +95,7 @@ class GroupDetailsPage extends StatelessWidget {
           List<dynamic> members = groupData['members'] ?? [];
           String owner = groupData['owner'];
 
-          bool isOwner = _auth.currentUser?.email == owner;
+          bool isOwner = user.username == owner;
 
           return Padding(
             padding: const EdgeInsets.all(16.0),

@@ -1,11 +1,14 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:traveltribe/models/user_model.dart';
 
+@RoutePage()
 class ItineraryPage extends StatefulWidget {
+  final UserModel user;
   final String groupId;
 
-  ItineraryPage({required this.groupId});
+  ItineraryPage({required this.groupId, required this.user});
 
   @override
   _ItineraryPageState createState() => _ItineraryPageState();
@@ -13,7 +16,7 @@ class ItineraryPage extends StatefulWidget {
 
 class _ItineraryPageState extends State<ItineraryPage> {
   late TextEditingController _itineraryController;
-  late String groupOwnerEmail;
+  late String groupOwnerUsername;
 
   @override
   void initState() {
@@ -47,7 +50,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
   Future<void> _getGroupData() async {
     DocumentSnapshot groupDoc = await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).get();
     var groupData = groupDoc.data() as Map<String, dynamic>;
-    groupOwnerEmail = groupData['owner'];
+    groupOwnerUsername = groupData['owner'];
   }
 
   @override
@@ -59,8 +62,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () {
-              User? user = FirebaseAuth.instance.currentUser;
-              if (user?.email == groupOwnerEmail) {
+              if (widget.user.username == groupOwnerUsername) {
                 _finalizeTrip();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(

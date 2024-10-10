@@ -1,9 +1,15 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:traveltribe/models/user_model.dart';
 
+@RoutePage()
 class GroupCreationPage extends StatefulWidget {
+  final UserModel user;
+
+  const GroupCreationPage({super.key, required this.user});
+
   @override
   _GroupCreationPageState createState() => _GroupCreationPageState();
 }
@@ -20,10 +26,9 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
     String groupName = _groupNameController.text.trim();
     String destination = _destinationController.text.trim();
     String description = _descriptionController.text.trim();
-    User? user = FirebaseAuth.instance.currentUser;
 
-    if (groupName.isNotEmpty && destination.isNotEmpty && user != null && _startDate != null && _endDate != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    if (groupName.isNotEmpty && destination.isNotEmpty && _startDate != null && _endDate != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(widget.user.id).get();
       String userName = userDoc['fullName'] ?? 'Unknown User'; 
 
       await FirebaseFirestore.instance.collection('groups').add({
@@ -32,11 +37,11 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
         'description': description,
         'startDate': DateFormat('dd-MM-yyyy').format(_startDate!),
         'endDate': DateFormat('dd-MM-yyyy').format(_endDate!),
-        'owner': user.email,
+        'owner': widget.user.username,
         'members': [userName], 
       });
 
-      Navigator.pop(context);
+      AutoRouter.of(context).maybePop();
     }
   }
 

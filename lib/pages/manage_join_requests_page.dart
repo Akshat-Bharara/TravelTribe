@@ -1,14 +1,13 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:traveltribe/models/user_model.dart';
 
+@RoutePage()
 class ManageJoinRequestsPage extends StatelessWidget {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final UserModel user;
 
-  Future<String> _getUserName(String email) async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(email).get();
-    return userDoc['name'] ?? 'Unknown User'; 
-  }
+  const ManageJoinRequestsPage({super.key, required this.user});
 
   void _handleJoinRequest(String requestId, bool isAccepted) async {
     await FirebaseFirestore.instance.collection('join_requests').doc(requestId).update({
@@ -35,7 +34,7 @@ class ManageJoinRequestsPage extends StatelessWidget {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('join_requests')
-            .where('groupOwner', isEqualTo: _auth.currentUser?.email)
+            .where('groupOwner', isEqualTo: user.username)
             .where('status', isEqualTo: 'pending')
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -54,30 +53,11 @@ class ManageJoinRequestsPage extends StatelessWidget {
               var requestData = doc.data() as Map<String, dynamic>;
               String requestingUserEmail = requestData['requestingUser'];
               
-              return FutureBuilder<String>(
-                future: _getUserName(requestingUserEmail),
-                builder: (context, userSnapshot) {
-                  if (userSnapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-
-                  if (userSnapshot.hasError) {
-                    return Card(
-                      elevation: 4,
-                      margin: EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        title: Text('Error loading user'),
-                      ),
-                    );
-                  }
-
-                  String userName = userSnapshot.data ?? 'Unknown User';
-                  
-                  return Card(
+              return Card(
                     elevation: 4,
                     margin: EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
-                      title: Text(userName),
+                      title: Text(user.username),
                       subtitle: Text(requestingUserEmail),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -94,8 +74,6 @@ class ManageJoinRequestsPage extends StatelessWidget {
                       ),
                     ),
                   );
-                },
-              );
             }).toList(),
           );
         },
