@@ -10,6 +10,64 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [AddExpensePage]
+class AddExpenseRoute extends PageRouteInfo<AddExpenseRouteArgs> {
+  AddExpenseRoute({
+    Key? key,
+    required Group group,
+    required UserModel user,
+    required GroupsBloc bloc,
+    List<PageRouteInfo>? children,
+  }) : super(
+          AddExpenseRoute.name,
+          args: AddExpenseRouteArgs(
+            key: key,
+            group: group,
+            user: user,
+            bloc: bloc,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'AddExpenseRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<AddExpenseRouteArgs>();
+      return AddExpensePage(
+        key: args.key,
+        group: args.group,
+        user: args.user,
+        bloc: args.bloc,
+      );
+    },
+  );
+}
+
+class AddExpenseRouteArgs {
+  const AddExpenseRouteArgs({
+    this.key,
+    required this.group,
+    required this.user,
+    required this.bloc,
+  });
+
+  final Key? key;
+
+  final Group group;
+
+  final UserModel user;
+
+  final GroupsBloc bloc;
+
+  @override
+  String toString() {
+    return 'AddExpenseRouteArgs{key: $key, group: $group, user: $user, bloc: $bloc}';
+  }
+}
+
+/// generated route for
 /// [AllGroupsPage]
 class AllGroupsRoute extends PageRouteInfo<AllGroupsRouteArgs> {
   AllGroupsRoute({
@@ -102,17 +160,77 @@ class DashboardRouteArgs {
 }
 
 /// generated route for
+/// [ExpenseTrackingPage]
+class ExpenseTrackingRoute extends PageRouteInfo<ExpenseTrackingRouteArgs> {
+  ExpenseTrackingRoute({
+    Key? key,
+    required Group group,
+    required UserModel user,
+    required GroupsBloc bloc,
+    List<PageRouteInfo>? children,
+  }) : super(
+          ExpenseTrackingRoute.name,
+          args: ExpenseTrackingRouteArgs(
+            key: key,
+            group: group,
+            user: user,
+            bloc: bloc,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'ExpenseTrackingRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<ExpenseTrackingRouteArgs>();
+      return ExpenseTrackingPage(
+        key: args.key,
+        group: args.group,
+        user: args.user,
+        bloc: args.bloc,
+      );
+    },
+  );
+}
+
+class ExpenseTrackingRouteArgs {
+  const ExpenseTrackingRouteArgs({
+    this.key,
+    required this.group,
+    required this.user,
+    required this.bloc,
+  });
+
+  final Key? key;
+
+  final Group group;
+
+  final UserModel user;
+
+  final GroupsBloc bloc;
+
+  @override
+  String toString() {
+    return 'ExpenseTrackingRouteArgs{key: $key, group: $group, user: $user, bloc: $bloc}';
+  }
+}
+
+/// generated route for
 /// [GroupCreationPage]
 class GroupCreationRoute extends PageRouteInfo<GroupCreationRouteArgs> {
   GroupCreationRoute({
     Key? key,
     required UserModel user,
+    required GroupsBloc bloc,
     List<PageRouteInfo>? children,
   }) : super(
           GroupCreationRoute.name,
           args: GroupCreationRouteArgs(
             key: key,
             user: user,
+            bloc: bloc,
           ),
           initialChildren: children,
         );
@@ -126,6 +244,7 @@ class GroupCreationRoute extends PageRouteInfo<GroupCreationRouteArgs> {
       return GroupCreationPage(
         key: args.key,
         user: args.user,
+        bloc: args.bloc,
       );
     },
   );
@@ -135,15 +254,18 @@ class GroupCreationRouteArgs {
   const GroupCreationRouteArgs({
     this.key,
     required this.user,
+    required this.bloc,
   });
 
   final Key? key;
 
   final UserModel user;
 
+  final GroupsBloc bloc;
+
   @override
   String toString() {
-    return 'GroupCreationRouteArgs{key: $key, user: $user}';
+    return 'GroupCreationRouteArgs{key: $key, user: $user, bloc: $bloc}';
   }
 }
 
@@ -151,12 +273,14 @@ class GroupCreationRouteArgs {
 /// [GroupDetailsPage]
 class GroupDetailsRoute extends PageRouteInfo<GroupDetailsRouteArgs> {
   GroupDetailsRoute({
+    Key? key,
     required String groupId,
     required UserModel user,
     List<PageRouteInfo>? children,
   }) : super(
           GroupDetailsRoute.name,
           args: GroupDetailsRouteArgs(
+            key: key,
             groupId: groupId,
             user: user,
           ),
@@ -170,6 +294,7 @@ class GroupDetailsRoute extends PageRouteInfo<GroupDetailsRouteArgs> {
     builder: (data) {
       final args = data.argsAs<GroupDetailsRouteArgs>();
       return GroupDetailsPage(
+        key: args.key,
         groupId: args.groupId,
         user: args.user,
       );
@@ -179,9 +304,12 @@ class GroupDetailsRoute extends PageRouteInfo<GroupDetailsRouteArgs> {
 
 class GroupDetailsRouteArgs {
   const GroupDetailsRouteArgs({
+    this.key,
     required this.groupId,
     required this.user,
   });
+
+  final Key? key;
 
   final String groupId;
 
@@ -189,7 +317,7 @@ class GroupDetailsRouteArgs {
 
   @override
   String toString() {
-    return 'GroupDetailsRouteArgs{groupId: $groupId, user: $user}';
+    return 'GroupDetailsRouteArgs{key: $key, groupId: $groupId, user: $user}';
   }
 }
 

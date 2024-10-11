@@ -23,6 +23,8 @@ class Authenticator extends ChangeNotifier {
     } on FirebaseAuthException catch (exception) {
       throw switch (exception.code) {
         'user-not-found' ||
+        'invalid-credential' ||
+        'INVALID_LOGIN_CREDENTIALS' ||
         'wrong-password' =>
           AppFailure.incorrectEmailOrPassword(),
         _ => AppFailure.unknown(),
@@ -59,15 +61,6 @@ class Authenticator extends ChangeNotifier {
     }
   }
 
-  Future<bool> isUserNameAvailable(String username) async {
-    return (await _db
-            .collection('users')
-            .where('username', isEqualTo: username)
-            .get())
-        .docs
-        .isEmpty;
-  }
-
   Future<UserModel?> get currentUser async {
     if (_auth.currentUser == null) {
       return null;
@@ -80,6 +73,7 @@ class Authenticator extends ChangeNotifier {
     }
     return UserModel.fromJson({
       ...data,
+      'email': _auth.currentUser!.email,
       'id': _auth.currentUser!.uid,
       'email_verified': _auth.currentUser!.emailVerified,
     });

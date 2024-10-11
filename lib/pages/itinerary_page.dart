@@ -22,7 +22,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
   void initState() {
     super.initState();
     _itineraryController = TextEditingController();
-    _getGroupData(); 
+    _getGroupData();
   }
 
   @override
@@ -32,23 +32,34 @@ class _ItineraryPageState extends State<ItineraryPage> {
   }
 
   void _updateItinerary() async {
-    await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).update({
+    await FirebaseFirestore.instance
+        .collection('groups')
+        .doc(widget.groupId)
+        .update({
       'itinerary': _itineraryController.text,
     });
   }
 
-  void _finalizeTrip() async {
-    await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).update({
+  void _finalizeTrip(BuildContext context) async {
+    await FirebaseFirestore.instance
+        .collection('groups')
+        .doc(widget.groupId)
+        .update({
       'tripFinalized': true,
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Trip has been finalized!')),
-    );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Trip has been finalized!')),
+      );
+    }
   }
 
   Future<void> _getGroupData() async {
-    DocumentSnapshot groupDoc = await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).get();
+    DocumentSnapshot groupDoc = await FirebaseFirestore.instance
+        .collection('groups')
+        .doc(widget.groupId)
+        .get();
     var groupData = groupDoc.data() as Map<String, dynamic>;
     groupOwnerUsername = groupData['owner'];
   }
@@ -58,23 +69,13 @@ class _ItineraryPageState extends State<ItineraryPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Itinerary'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.check),
-            onPressed: () {
-              if (widget.user.username == groupOwnerUsername) {
-                _finalizeTrip();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Only the group owner can finalize the trip.')),
-                );
-              }
-            },
-          ),
-        ],
+        centerTitle: true,
       ),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection('groups').doc(widget.groupId).snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('groups')
+            .doc(widget.groupId)
+            .snapshots(),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -87,32 +88,61 @@ class _ItineraryPageState extends State<ItineraryPage> {
           }
 
           var groupData = snapshot.data!.data() as Map<String, dynamic>;
-          String itinerary = groupData['itinerary'] ?? 'No itinerary generated yet.';
+          String itinerary =
+              groupData['itinerary'] ?? 'No itinerary generated yet.';
           _itineraryController.text = itinerary;
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _itineraryController,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      labelText: 'Edit Itinerary',
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (value) {
-                      _updateItinerary();
+          return Scaffold(
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.miniCenterFloat,
+            floatingActionButton: groupData['tripFinalized'] != true
+                ? FloatingActionButton(
+                    onPressed: () {
+                      if (widget.user.username == groupOwnerUsername) {
+                        _finalizeTrip(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'Only the group owner can finalize the trip.')),
+                        );
+                      }
                     },
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Real-time updates will reflect in the itinerary.',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ],
+                    child: Text("Finalize"),
+                  )
+                : null,
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 16),
+                    if (groupData['tripFinalized'] != true) ...[
+                      TextField(
+                        controller: _itineraryController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: 'Edit Itinerary',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          _updateItinerary();
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Real-time updates will reflect in the itinerary.',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    ] else
+                      Text(
+                        itinerary,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    SizedBox(height: 64)
+                  ],
+                ),
               ),
             ),
           );

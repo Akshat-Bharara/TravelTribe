@@ -1,54 +1,30 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:traveltribe/bloc/gemini/gemini_bloc.dart';
+import 'package:traveltribe/bloc/groups/groups_bloc.dart';
+import 'package:traveltribe/models/group.dart';
 import 'package:traveltribe/models/user_model.dart';
-import 'package:traveltribe/router/app_router.dart'; 
+import 'package:traveltribe/router/app_router.dart';
+import 'package:traveltribe/services/service_locator.dart';
 
 @RoutePage()
 class GroupDetailsPage extends StatelessWidget {
   final UserModel user;
   final String groupId;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  GroupDetailsPage({required this.groupId, required this.user});
+  GroupDetailsPage({
+    super.key,
+    required this.groupId,
+    required this.user,
+  });
 
-  Future<void> _generateItinerary(BuildContext context) async {
-    final _gemini = Gemini.instance;
-
-    DocumentSnapshot groupDoc = await FirebaseFirestore.instance.collection('groups').doc(groupId).get();
-    var groupData = groupDoc.data() as Map<String, dynamic>;
-
-    String destination = groupData['destination'];
-    String startDate = groupData['startDate'];
-    String endDate = groupData['endDate'];
-
-    String prompt = "Generate a detailed itinerary for a trip to $destination from $startDate to $endDate";
-
-    try {
-      var response = await _gemini.text(prompt);
-      
-      String? itinerary = response?.output;
-
-      if (itinerary == null || itinerary.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to generate an itinerary. Please try again later.')),
-        );
-        return;
-      }
-
-      await FirebaseFirestore.instance.collection('groups').doc(groupId).update({
-        'itinerary': itinerary,
-      });
-
-      AutoRouter.of(context).navigate(ItineraryRoute(groupId: groupId, user: user));
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error generating itinerary: $error')),
-      );
-    }
-  }
-
-  Future<void> _showConfirmationDialog(BuildContext context) async {
+  Future<void> _showConfirmationDialog(
+    BuildContext context,
+    GeminiBloc bloc,
+    Group group,
+  ) async {
     bool confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -68,88 +44,123 @@ class GroupDetailsPage extends StatelessWidget {
     );
 
     if (confirm) {
-      _generateItinerary(context);
+      bloc.add(
+        GeminiEvent.generateItinerary(group),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Group Details'),
+    return BlocProvider(
+      create: (context) => sl<GeminiBloc>(),
+      child: BlocConsumer<GeminiBloc, GeminiState>(
+        listenWhen: (previous, current) => current is GeminiLoaded,
+        listener: (_, __) =>
+            ScaffoldMessenger.maybeOf(scaffoldKey.currentContext ?? context)
+                ?.showSnackBar(SnackBar(content: Text('Itinerary generated'))),
+        builder: (context, state) => BlocProvider(
+          create: (context) =>
+              sl<GroupsBloc>()..add(GroupsEvent.fetchGroup(groupId)),
+          child: switch (state) {
+            GeminiLoading() => Center(child: CircularProgressIndicator()),
+            GeminiLoaded() || GeminiError() || GeminiInitial() => Scaffold(
+                key: scaffoldKey,
+                appBar: AppBar(
+                  title: Text('Group Details'),
+                  centerTitle: true,
+                ),
+                body: BlocBuilder<GroupsBloc, GroupsState>(
+                  builder: (context, state) => switch (state) {
+                    GroupsLoading() =>
+                      Center(child: CircularProgressIndicator()),
+                    GroupsError() =>
+                      Center(child: Text("Something went wrong")),
+                    Loaded() => _buildGroupDetails(context, state.group),
+                    Created() => _buildGroupDetails(context, state.group),
+                    Updated() => _buildGroupDetails(context, state.group)
+                  },
+                ),
+              )
+          },
+        ),
       ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection('groups').doc(groupId).snapshots(),
-        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return Center(child: Text('Group not found'));
-          }
+    );
+  }
 
-          var groupData = snapshot.data!.data() as Map<String, dynamic>;
-          List<dynamic> members = groupData['members'] ?? [];
-          String owner = groupData['owner'];
-
-          bool isOwner = user.username == owner;
-
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Group Name: ${groupData['groupName']}',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Destination: ${groupData['destination']}',
-                  style: TextStyle(fontSize: 18),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Owner: ${groupData['owner']}',
-                  style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
-                ),
-                SizedBox(height: 10),
-                if (groupData['startDate'] != null && groupData['endDate'] != null)
-                  Text(
-                    'Dates: ${groupData['startDate']} to ${groupData['endDate']}',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                SizedBox(height: 20),
-                Text(
-                  'Members',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: members.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(members[index]),
-                      );
-                    },
-                  ),
-                ),
-                if (isOwner)
-                  ElevatedButton(
-                    onPressed: () => _showConfirmationDialog(context),
-                    child: Text('Generate Itinerary'),
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                    ),
-                  ),
-              ],
+  Padding _buildGroupDetails(BuildContext context, Group group) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Group Name: ${group.groupName}',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-          );
-        },
+            SizedBox(height: 10),
+            Text(
+              'Destination: ${group.destination}',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Owner: ${group.owner}',
+              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Dates: ${group.startDate} to ${group.endDate}',
+              style: TextStyle(fontSize: 16),
+            ),
+            if (group.owner == user.username && group.itinerary == null)
+              ListTile(
+                trailing: Icon(Icons.arrow_forward_ios),
+                contentPadding: EdgeInsets.zero,
+                onTap: () => _showConfirmationDialog(
+                  context,
+                  BlocProvider.of<GeminiBloc>(context),
+                  group,
+                ),
+                title: Text('Generate Itinerary'),
+              )
+            else
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                trailing: Icon(Icons.arrow_forward_ios),
+                onTap: () => AutoRouter.of(context).push(
+                  ItineraryRoute(groupId: group.id, user: user),
+                ),
+                title: Text("View Itinerary"),
+              ),
+            ListTile(
+              trailing: Icon(Icons.arrow_forward_ios),
+              contentPadding: EdgeInsets.zero,
+              onTap: () => AutoRouter.of(context).push(
+                ExpenseTrackingRoute(
+                    group: group,
+                    user: user,
+                    bloc: BlocProvider.of<GroupsBloc>(context)),
+              ),
+              title: Text("View Expenses"),
+            ),
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              collapsedShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: Text('Members'),
+              children: List.generate(
+                group.members.length,
+                (index) => ListTile(title: Text(group.members[index])),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

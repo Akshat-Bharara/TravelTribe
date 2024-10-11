@@ -6,7 +6,8 @@ import 'package:traveltribe/models/user_model.dart';
 @RoutePage()
 class AllGroupsPage extends StatelessWidget {
   final UserModel user;
-  const AllGroupsPage({super.key, required this.user});
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  AllGroupsPage({super.key, required this.user});
 
   void _sendJoinRequest(String groupId, String groupOwner) async {
     await FirebaseFirestore.instance.collection('join_requests').add({
@@ -16,13 +17,23 @@ class AllGroupsPage extends StatelessWidget {
       'requestingUserName': user.username,
       'status': 'pending',
     });
+
+    if (scaffoldKey.currentContext != null) {
+      ScaffoldMessenger.maybeOf(scaffoldKey.currentContext!)?.showSnackBar(
+        SnackBar(
+          content: Text('Join request sent!'),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text('All Groups'),
+        centerTitle: true,
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('groups').snapshots(),

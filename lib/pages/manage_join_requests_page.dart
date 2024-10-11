@@ -10,16 +10,25 @@ class ManageJoinRequestsPage extends StatelessWidget {
   const ManageJoinRequestsPage({super.key, required this.user});
 
   void _handleJoinRequest(String requestId, bool isAccepted) async {
-    await FirebaseFirestore.instance.collection('join_requests').doc(requestId).update({
+    await FirebaseFirestore.instance
+        .collection('join_requests')
+        .doc(requestId)
+        .update({
       'status': isAccepted ? 'accepted' : 'rejected',
     });
 
     if (isAccepted) {
-      var request = await FirebaseFirestore.instance.collection('join_requests').doc(requestId).get();
+      var request = await FirebaseFirestore.instance
+          .collection('join_requests')
+          .doc(requestId)
+          .get();
       var groupId = request['groupId'];
-      var requestingUser = request['requestingUser'];
+      var requestingUser = request['requestingUserName'];
 
-      await FirebaseFirestore.instance.collection('groups').doc(groupId).update({
+      await FirebaseFirestore.instance
+          .collection('groups')
+          .doc(groupId)
+          .update({
         'members': FieldValue.arrayUnion([requestingUser]),
       });
     }
@@ -30,6 +39,7 @@ class ManageJoinRequestsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Manage Join Requests'),
+        centerTitle: true,
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
@@ -52,28 +62,28 @@ class ManageJoinRequestsPage extends StatelessWidget {
             children: snapshot.data!.docs.map((doc) {
               var requestData = doc.data() as Map<String, dynamic>;
               String requestingUserEmail = requestData['requestingUser'];
-              
+
               return Card(
-                    elevation: 4,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      title: Text(user.username),
-                      subtitle: Text(requestingUserEmail),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.check, color: Colors.green),
-                            onPressed: () => _handleJoinRequest(doc.id, true),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close, color: Colors.red),
-                            onPressed: () => _handleJoinRequest(doc.id, false),
-                          ),
-                        ],
+                elevation: 4,
+                margin: EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  title: Text(user.username),
+                  subtitle: Text(requestingUserEmail),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.check, color: Colors.green),
+                        onPressed: () => _handleJoinRequest(doc.id, true),
                       ),
-                    ),
-                  );
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.red),
+                        onPressed: () => _handleJoinRequest(doc.id, false),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }).toList(),
           );
         },

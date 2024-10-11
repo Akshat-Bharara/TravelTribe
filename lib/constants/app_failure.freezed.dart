@@ -21,6 +21,7 @@ mixin _$AppFailure {
     required TResult Function() emailAlreadyUsed,
     required TResult Function() unknown,
     required TResult Function() incorrectEmailOrPassword,
+    required TResult Function() noGeminiResponse,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -28,6 +29,7 @@ mixin _$AppFailure {
     TResult? Function()? emailAlreadyUsed,
     TResult? Function()? unknown,
     TResult? Function()? incorrectEmailOrPassword,
+    TResult? Function()? noGeminiResponse,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -35,6 +37,7 @@ mixin _$AppFailure {
     TResult Function()? emailAlreadyUsed,
     TResult Function()? unknown,
     TResult Function()? incorrectEmailOrPassword,
+    TResult Function()? noGeminiResponse,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -44,6 +47,7 @@ mixin _$AppFailure {
     required TResult Function(_Unknown value) unknown,
     required TResult Function(_IncorrectEmailOrPassword value)
         incorrectEmailOrPassword,
+    required TResult Function(_NoGeminiResponse value) noGeminiResponse,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -52,6 +56,7 @@ mixin _$AppFailure {
     TResult? Function(_Unknown value)? unknown,
     TResult? Function(_IncorrectEmailOrPassword value)?
         incorrectEmailOrPassword,
+    TResult? Function(_NoGeminiResponse value)? noGeminiResponse,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -59,6 +64,7 @@ mixin _$AppFailure {
     TResult Function(_EmailAlreadyUsed value)? emailAlreadyUsed,
     TResult Function(_Unknown value)? unknown,
     TResult Function(_IncorrectEmailOrPassword value)? incorrectEmailOrPassword,
+    TResult Function(_NoGeminiResponse value)? noGeminiResponse,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -129,6 +135,7 @@ class _$EmailAlreadyUsedImpl implements _EmailAlreadyUsed {
     required TResult Function() emailAlreadyUsed,
     required TResult Function() unknown,
     required TResult Function() incorrectEmailOrPassword,
+    required TResult Function() noGeminiResponse,
   }) {
     return emailAlreadyUsed();
   }
@@ -139,6 +146,7 @@ class _$EmailAlreadyUsedImpl implements _EmailAlreadyUsed {
     TResult? Function()? emailAlreadyUsed,
     TResult? Function()? unknown,
     TResult? Function()? incorrectEmailOrPassword,
+    TResult? Function()? noGeminiResponse,
   }) {
     return emailAlreadyUsed?.call();
   }
@@ -149,6 +157,7 @@ class _$EmailAlreadyUsedImpl implements _EmailAlreadyUsed {
     TResult Function()? emailAlreadyUsed,
     TResult Function()? unknown,
     TResult Function()? incorrectEmailOrPassword,
+    TResult Function()? noGeminiResponse,
     required TResult orElse(),
   }) {
     if (emailAlreadyUsed != null) {
@@ -164,6 +173,7 @@ class _$EmailAlreadyUsedImpl implements _EmailAlreadyUsed {
     required TResult Function(_Unknown value) unknown,
     required TResult Function(_IncorrectEmailOrPassword value)
         incorrectEmailOrPassword,
+    required TResult Function(_NoGeminiResponse value) noGeminiResponse,
   }) {
     return emailAlreadyUsed(this);
   }
@@ -175,6 +185,7 @@ class _$EmailAlreadyUsedImpl implements _EmailAlreadyUsed {
     TResult? Function(_Unknown value)? unknown,
     TResult? Function(_IncorrectEmailOrPassword value)?
         incorrectEmailOrPassword,
+    TResult? Function(_NoGeminiResponse value)? noGeminiResponse,
   }) {
     return emailAlreadyUsed?.call(this);
   }
@@ -185,6 +196,7 @@ class _$EmailAlreadyUsedImpl implements _EmailAlreadyUsed {
     TResult Function(_EmailAlreadyUsed value)? emailAlreadyUsed,
     TResult Function(_Unknown value)? unknown,
     TResult Function(_IncorrectEmailOrPassword value)? incorrectEmailOrPassword,
+    TResult Function(_NoGeminiResponse value)? noGeminiResponse,
     required TResult orElse(),
   }) {
     if (emailAlreadyUsed != null) {
@@ -242,6 +254,7 @@ class _$UnknownImpl implements _Unknown {
     required TResult Function() emailAlreadyUsed,
     required TResult Function() unknown,
     required TResult Function() incorrectEmailOrPassword,
+    required TResult Function() noGeminiResponse,
   }) {
     return unknown();
   }
@@ -252,6 +265,7 @@ class _$UnknownImpl implements _Unknown {
     TResult? Function()? emailAlreadyUsed,
     TResult? Function()? unknown,
     TResult? Function()? incorrectEmailOrPassword,
+    TResult? Function()? noGeminiResponse,
   }) {
     return unknown?.call();
   }
@@ -262,6 +276,7 @@ class _$UnknownImpl implements _Unknown {
     TResult Function()? emailAlreadyUsed,
     TResult Function()? unknown,
     TResult Function()? incorrectEmailOrPassword,
+    TResult Function()? noGeminiResponse,
     required TResult orElse(),
   }) {
     if (unknown != null) {
@@ -277,6 +292,7 @@ class _$UnknownImpl implements _Unknown {
     required TResult Function(_Unknown value) unknown,
     required TResult Function(_IncorrectEmailOrPassword value)
         incorrectEmailOrPassword,
+    required TResult Function(_NoGeminiResponse value) noGeminiResponse,
   }) {
     return unknown(this);
   }
@@ -288,6 +304,7 @@ class _$UnknownImpl implements _Unknown {
     TResult? Function(_Unknown value)? unknown,
     TResult? Function(_IncorrectEmailOrPassword value)?
         incorrectEmailOrPassword,
+    TResult? Function(_NoGeminiResponse value)? noGeminiResponse,
   }) {
     return unknown?.call(this);
   }
@@ -298,6 +315,7 @@ class _$UnknownImpl implements _Unknown {
     TResult Function(_EmailAlreadyUsed value)? emailAlreadyUsed,
     TResult Function(_Unknown value)? unknown,
     TResult Function(_IncorrectEmailOrPassword value)? incorrectEmailOrPassword,
+    TResult Function(_NoGeminiResponse value)? noGeminiResponse,
     required TResult orElse(),
   }) {
     if (unknown != null) {
@@ -358,6 +376,7 @@ class _$IncorrectEmailOrPasswordImpl implements _IncorrectEmailOrPassword {
     required TResult Function() emailAlreadyUsed,
     required TResult Function() unknown,
     required TResult Function() incorrectEmailOrPassword,
+    required TResult Function() noGeminiResponse,
   }) {
     return incorrectEmailOrPassword();
   }
@@ -368,6 +387,7 @@ class _$IncorrectEmailOrPasswordImpl implements _IncorrectEmailOrPassword {
     TResult? Function()? emailAlreadyUsed,
     TResult? Function()? unknown,
     TResult? Function()? incorrectEmailOrPassword,
+    TResult? Function()? noGeminiResponse,
   }) {
     return incorrectEmailOrPassword?.call();
   }
@@ -378,6 +398,7 @@ class _$IncorrectEmailOrPasswordImpl implements _IncorrectEmailOrPassword {
     TResult Function()? emailAlreadyUsed,
     TResult Function()? unknown,
     TResult Function()? incorrectEmailOrPassword,
+    TResult Function()? noGeminiResponse,
     required TResult orElse(),
   }) {
     if (incorrectEmailOrPassword != null) {
@@ -393,6 +414,7 @@ class _$IncorrectEmailOrPasswordImpl implements _IncorrectEmailOrPassword {
     required TResult Function(_Unknown value) unknown,
     required TResult Function(_IncorrectEmailOrPassword value)
         incorrectEmailOrPassword,
+    required TResult Function(_NoGeminiResponse value) noGeminiResponse,
   }) {
     return incorrectEmailOrPassword(this);
   }
@@ -404,6 +426,7 @@ class _$IncorrectEmailOrPasswordImpl implements _IncorrectEmailOrPassword {
     TResult? Function(_Unknown value)? unknown,
     TResult? Function(_IncorrectEmailOrPassword value)?
         incorrectEmailOrPassword,
+    TResult? Function(_NoGeminiResponse value)? noGeminiResponse,
   }) {
     return incorrectEmailOrPassword?.call(this);
   }
@@ -414,6 +437,7 @@ class _$IncorrectEmailOrPasswordImpl implements _IncorrectEmailOrPassword {
     TResult Function(_EmailAlreadyUsed value)? emailAlreadyUsed,
     TResult Function(_Unknown value)? unknown,
     TResult Function(_IncorrectEmailOrPassword value)? incorrectEmailOrPassword,
+    TResult Function(_NoGeminiResponse value)? noGeminiResponse,
     required TResult orElse(),
   }) {
     if (incorrectEmailOrPassword != null) {
@@ -425,4 +449,123 @@ class _$IncorrectEmailOrPasswordImpl implements _IncorrectEmailOrPassword {
 
 abstract class _IncorrectEmailOrPassword implements AppFailure {
   const factory _IncorrectEmailOrPassword() = _$IncorrectEmailOrPasswordImpl;
+}
+
+/// @nodoc
+abstract class _$$NoGeminiResponseImplCopyWith<$Res> {
+  factory _$$NoGeminiResponseImplCopyWith(_$NoGeminiResponseImpl value,
+          $Res Function(_$NoGeminiResponseImpl) then) =
+      __$$NoGeminiResponseImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$NoGeminiResponseImplCopyWithImpl<$Res>
+    extends _$AppFailureCopyWithImpl<$Res, _$NoGeminiResponseImpl>
+    implements _$$NoGeminiResponseImplCopyWith<$Res> {
+  __$$NoGeminiResponseImplCopyWithImpl(_$NoGeminiResponseImpl _value,
+      $Res Function(_$NoGeminiResponseImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of AppFailure
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$NoGeminiResponseImpl implements _NoGeminiResponse {
+  const _$NoGeminiResponseImpl();
+
+  @override
+  String toString() {
+    return 'AppFailure.noGeminiResponse()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$NoGeminiResponseImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() emailAlreadyUsed,
+    required TResult Function() unknown,
+    required TResult Function() incorrectEmailOrPassword,
+    required TResult Function() noGeminiResponse,
+  }) {
+    return noGeminiResponse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? emailAlreadyUsed,
+    TResult? Function()? unknown,
+    TResult? Function()? incorrectEmailOrPassword,
+    TResult? Function()? noGeminiResponse,
+  }) {
+    return noGeminiResponse?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? emailAlreadyUsed,
+    TResult Function()? unknown,
+    TResult Function()? incorrectEmailOrPassword,
+    TResult Function()? noGeminiResponse,
+    required TResult orElse(),
+  }) {
+    if (noGeminiResponse != null) {
+      return noGeminiResponse();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_EmailAlreadyUsed value) emailAlreadyUsed,
+    required TResult Function(_Unknown value) unknown,
+    required TResult Function(_IncorrectEmailOrPassword value)
+        incorrectEmailOrPassword,
+    required TResult Function(_NoGeminiResponse value) noGeminiResponse,
+  }) {
+    return noGeminiResponse(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_EmailAlreadyUsed value)? emailAlreadyUsed,
+    TResult? Function(_Unknown value)? unknown,
+    TResult? Function(_IncorrectEmailOrPassword value)?
+        incorrectEmailOrPassword,
+    TResult? Function(_NoGeminiResponse value)? noGeminiResponse,
+  }) {
+    return noGeminiResponse?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_EmailAlreadyUsed value)? emailAlreadyUsed,
+    TResult Function(_Unknown value)? unknown,
+    TResult Function(_IncorrectEmailOrPassword value)? incorrectEmailOrPassword,
+    TResult Function(_NoGeminiResponse value)? noGeminiResponse,
+    required TResult orElse(),
+  }) {
+    if (noGeminiResponse != null) {
+      return noGeminiResponse(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _NoGeminiResponse implements AppFailure {
+  const factory _NoGeminiResponse() = _$NoGeminiResponseImpl;
 }

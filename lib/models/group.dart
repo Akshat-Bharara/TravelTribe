@@ -1,44 +1,25 @@
-// lib/models/group.dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:traveltribe/models/expense.dart';
 
-class Group {
-  String id;
-  String ownerId;
-  String groupName;
-  String destination;
-  DateTime startDate;
-  DateTime endDate;
-  List<String> members;
+part 'group.freezed.dart';
+part 'group.g.dart';
 
-  Group({
-    required this.id,
-    required this.ownerId,
-    required this.groupName,
-    required this.destination,
-    required this.startDate,
-    required this.endDate,
-    required this.members,
-  });
+@freezed
+class Group with _$Group {
+  // ignore: invalid_annotation_target
+  @JsonSerializable(explicitToJson: true)
+  const factory Group({
+    required final String id,
+    required final String owner,
+    required final String groupName,
+    required final String destination,
+    required final String description,
+    required final String startDate,
+    required final String endDate,
+    required final List<String> members,
+    required final String? itinerary,
+    required final List<Expense> expenses,
+  }) = _Group;
 
-  factory Group.fromMap(Map<String, dynamic> data, String documentId) {
-    return Group(
-      id: documentId,
-      ownerId: data['ownerId'],
-      groupName: data['groupName'],
-      destination: data['destination'],
-      startDate: DateTime.parse(data['startDate']),
-      endDate: DateTime.parse(data['endDate']),
-      members: List<String>.from(data['members']),
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'ownerId': ownerId,
-      'groupName': groupName,
-      'destination': destination,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
-      'members': members,
-    };
-  }
+  factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
 }

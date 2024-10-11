@@ -8,7 +8,10 @@ import 'package:traveltribe/services/service_locator.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  Gemini.init(apiKey: String.fromEnvironment("GEMINI_API_KEY"));
+  Gemini.init(
+      apiKey: String.fromEnvironment("GEMINI_API_KEY"));
+  initServices();
+  initBloc();
   runApp(MyApp());
 }
 

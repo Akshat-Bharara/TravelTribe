@@ -1,17 +1,18 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:traveltribe/bloc/groups/groups_bloc.dart';
 import 'package:traveltribe/models/user_model.dart';
 
 @RoutePage()
 class GroupCreationPage extends StatefulWidget {
   final UserModel user;
+  final GroupsBloc bloc;
 
-  const GroupCreationPage({super.key, required this.user});
+  const GroupCreationPage({super.key, required this.user, required this.bloc});
 
   @override
-  _GroupCreationPageState createState() => _GroupCreationPageState();
+  State<GroupCreationPage> createState() => _GroupCreationPageState();
 }
 
 class _GroupCreationPageState extends State<GroupCreationPage> {
@@ -22,26 +23,32 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
   DateTime? _startDate;
   DateTime? _endDate;
 
-  void _createGroup() async {
+  void _createGroup(BuildContext context) async {
     String groupName = _groupNameController.text.trim();
     String destination = _destinationController.text.trim();
     String description = _descriptionController.text.trim();
 
-    if (groupName.isNotEmpty && destination.isNotEmpty && _startDate != null && _endDate != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(widget.user.id).get();
-      String userName = userDoc['fullName'] ?? 'Unknown User'; 
-
-      await FirebaseFirestore.instance.collection('groups').add({
-        'groupName': groupName,
-        'destination': destination,
-        'description': description,
-        'startDate': DateFormat('dd-MM-yyyy').format(_startDate!),
-        'endDate': DateFormat('dd-MM-yyyy').format(_endDate!),
-        'owner': widget.user.username,
-        'members': [userName], 
-      });
-
+    if (groupName.isNotEmpty &&
+        destination.isNotEmpty &&
+        _startDate != null &&
+        _endDate != null) {
+      widget.bloc.add(
+        GroupsEvent.createGroup(
+          groupName,
+          destination,
+          description,
+          _startDate!,
+          _endDate!,
+          widget.user.username,
+        ),
+      );
       AutoRouter.of(context).maybePop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill all fields'),
+        ),
+      );
     }
   }
 
@@ -78,6 +85,7 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Create Group'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -95,7 +103,8 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
               TextField(
                 controller: _descriptionController,
                 maxLines: 3,
-                decoration: InputDecoration(labelText: 'Description (optional)'),
+                decoration:
+                    InputDecoration(labelText: 'Description (optional)'),
               ),
               SizedBox(height: 20),
               Row(
@@ -129,9 +138,11 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                 ],
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _createGroup,
-                child: Text('Create Group'),
+              Builder(
+                builder: (context) => ElevatedButton(
+                  onPressed: () => _createGroup(context),
+                  child: Text('Create Group'),
+                ),
               ),
             ],
           ),

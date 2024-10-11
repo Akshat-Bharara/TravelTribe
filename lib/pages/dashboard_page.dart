@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:traveltribe/bloc/auth/auth_bloc.dart';
+import 'package:traveltribe/bloc/groups/groups_bloc.dart';
 import 'package:traveltribe/models/user_model.dart';
 import 'package:traveltribe/router/app_router.dart';
+import 'package:traveltribe/services/service_locator.dart';
 
 @RoutePage()
 class DashboardPage extends StatefulWidget {
@@ -22,12 +24,11 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _navigateToPage(
-      BuildContext context, String groupId, bool hasItinerary) {
-    if (hasItinerary) {
-      AutoRouter.of(context).push(ItineraryRoute(groupId: groupId, user: widget.user));
-    } else {
-      AutoRouter.of(context).push(GroupDetailsRoute(groupId: groupId, user: widget.user));
-    }
+    BuildContext context,
+    String groupId,
+  ) {
+    AutoRouter.of(context)
+        .push(GroupDetailsRoute(groupId: groupId, user: widget.user));
   }
 
   @override
@@ -35,6 +36,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
@@ -69,9 +71,6 @@ class _DashboardPageState extends State<DashboardPage> {
                   return ListView(
                     children: snapshot.data!.docs.map((doc) {
                       var groupData = doc.data() as Map<String, dynamic>;
-                      bool hasItinerary = groupData.containsKey('itinerary') &&
-                          groupData['itinerary'] != null;
-
                       return Card(
                         elevation: 4,
                         margin: EdgeInsets.symmetric(vertical: 8),
@@ -89,7 +88,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                           trailing: Icon(Icons.arrow_forward_ios),
                           onTap: () {
-                            _navigateToPage(context, doc.id, hasItinerary);
+                            _navigateToPage(context, doc.id);
                           },
                         ),
                       );
@@ -101,7 +100,8 @@ class _DashboardPageState extends State<DashboardPage> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                AutoRouter.of(context).navigate(ManageJoinRequestsRoute(user: widget.user));
+                AutoRouter.of(context)
+                    .push(ManageJoinRequestsRoute(user: widget.user));
               },
               child: Text('Manage Join Requests'),
               style: ElevatedButton.styleFrom(
@@ -113,7 +113,12 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          AutoRouter.of(context).navigate(GroupCreationRoute(user: widget.user));
+          AutoRouter.of(context).push(
+            GroupCreationRoute(
+              user: widget.user,
+              bloc: sl<GroupsBloc>(),
+            ),
+          );
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.blueAccent,
