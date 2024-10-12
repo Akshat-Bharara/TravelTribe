@@ -35,7 +35,9 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   _usernameListener() {
-    _isUsernameAvailable = null;
+    setState(() {
+      _isUsernameAvailable = null;
+    });
     _debouncedUsernameCheck();
   }
 
@@ -89,10 +91,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextFormField(
                   key: _nameKey,
                   controller: _nameController,
+                  onChanged: (value) => _isUsernameAvailable = null,
                   validator: (value) => value == null ||
                           value.trim().isEmpty ||
                           value.trim().length < 4
-                      ? 'Please enter username of lenghth 4 or more'
+                      ? 'Please enter username of length 4 or more'
                       : null,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   forceErrorText:
